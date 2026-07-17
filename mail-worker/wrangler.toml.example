@@ -1,0 +1,57 @@
+name = "cloud-mail"
+main = "src/index.js"
+compatibility_date = "2025-06-04"
+keep_vars = true
+workers_dev = true
+preview_urls = true
+
+# Custom domain (memorable URL for the web UI)
+# Fill in your domain, or leave commented to use <worker>.<subdomain>.workers.dev
+# [[routes]]
+# pattern = "mail.example.com"
+# custom_domain = true
+
+[observability]
+enabled = true
+
+# Filled by scripts/setup-and-deploy.sh after creating/detecting resources
+[[d1_databases]]
+binding = "db"
+database_name = "cloud-mail"
+database_id = "REPLACE_D1_ID"
+
+[[kv_namespaces]]
+binding = "kv"
+id = "REPLACE_KV_ID"
+
+# Optional: enable R2 in Dashboard first, then uncomment
+# [[r2_buckets]]
+# binding = "r2"
+# bucket_name = "cloud-mail"
+
+# Optional: Cloudflare native Email Sending (if onboarded)
+# [[send_email]]
+# name = "email"
+
+[ai]
+binding = "ai"
+
+[assets]
+binding = "assets"
+directory = "./dist"
+not_found_handling = "single-page-application"
+run_worker_first = true
+
+[triggers]
+crons = ["0 16 * * *"]
+
+[vars]
+# domain must be a JSON array string (Cloud Mail parses env.domain as JSON)
+# Filled by setup-and-deploy.sh on first run (interactive prompt)
+# domain = '["example.com"]'
+# admin = "admin@example.com"
+# jwt_secret is stored as a Worker Secret (not in this file):
+#   printf '%s' "$(openssl rand -hex 32)" | wrangler secret put jwt_secret
+
+[build]
+command = "pnpm --prefix ../mail-vue install && pnpm --prefix ../mail-vue run build"
